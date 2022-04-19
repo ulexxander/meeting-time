@@ -2,6 +2,15 @@
 
 Interactive meeting timekeeper.
 
+## Tech stack
+
+Backend:
+
+- Go programming language
+- PostgreSQL relational database
+- GORM for accessing the database
+- GraphQL API
+
 ## Links
 
 - [Scrum meeting](https://www.productplan.com/glossary/scrum-meeting)
