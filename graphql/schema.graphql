@@ -1,0 +1,16 @@
+type Organization {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  organizationByID(id: ID!): Organization
+}
+
+input OrganizationCreate {
+  name: String!
+}
+
+type Mutation {
+  createOrganization(input: OrganizationCreate!): Organization!
+}
