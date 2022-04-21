@@ -10,3 +10,13 @@ type Team struct {
 	CreatedAt time.Time
 	UpdatedAt *time.Time
 }
+
+type Schedule struct {
+	ID        int
+	TeamID    int
+	Name      string
+	StartsAt  time.Time
+	EndsAt    time.Time
+	CreatedAt time.Time
+	UpdatedAt *time.Time
+}

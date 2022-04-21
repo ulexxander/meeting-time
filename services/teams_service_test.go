@@ -16,14 +16,14 @@ func TestTeamsService(t *testing.T) {
 	_, err := service.GetByID(123)
 	require.ErrorIs(t, err, storage.ErrNoTeam)
 
-	createdOrgID, err := service.Create(storage.TeamCreateParams{Name: "First!"})
+	createdTeamID, err := service.Create(storage.TeamCreateParams{Name: "Cool team"})
 	require.NoError(t, err)
 
-	orgByID, err := service.GetByID(createdOrgID)
+	teamByID, err := service.GetByID(createdTeamID)
 	require.NoError(t, err)
 
-	require.Equal(t, createdOrgID, orgByID.ID)
-	require.Equal(t, "First!", orgByID.Name)
-	require.NotZero(t, orgByID.CreatedAt)
-	require.Nil(t, orgByID.UpdatedAt)
+	require.Equal(t, createdTeamID, teamByID.ID)
+	require.Equal(t, "Cool team", teamByID.Name)
+	require.NotZero(t, teamByID.CreatedAt)
+	require.Nil(t, teamByID.UpdatedAt)
 }

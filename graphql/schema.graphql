@@ -5,16 +5,36 @@ type Team {
   name: String!
   createdAt: Time!
   updatedAt: Time
+  schedules: [Schedule!]!
+}
+
+type Schedule {
+  id: ID!
+  teamId: ID!
+  name: String!
+  startsAt: Time!
+  endsAt: Time!
+  createdAt: Time!
+  updatedAt: Time
 }
 
 type Query {
-  teamByID(id: ID!): Team
+  teamByID(id: ID!): Team!
+  scheduleByID(id: ID!): Schedule!
 }
 
 input TeamCreate {
   name: String!
 }
 
+input ScheduleCreate {
+  teamId: ID!
+  name: String!
+  startsAt: Time!
+  endsAt: Time!
+}
+
 type Mutation {
   teamCreate(input: TeamCreate!): ID!
+  scheduleCreate(input: ScheduleCreate!): ID!
 }

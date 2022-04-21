@@ -6,11 +6,29 @@ import (
 	"time"
 )
 
+type Schedule struct {
+	ID        int        `json:"id"`
+	TeamID    int        `json:"teamId"`
+	Name      string     `json:"name"`
+	StartsAt  time.Time  `json:"startsAt"`
+	EndsAt    time.Time  `json:"endsAt"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+}
+
+type ScheduleCreate struct {
+	TeamID   int       `json:"teamId"`
+	Name     string    `json:"name"`
+	StartsAt time.Time `json:"startsAt"`
+	EndsAt   time.Time `json:"endsAt"`
+}
+
 type Team struct {
 	ID        int        `json:"id"`
 	Name      string     `json:"name"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
+	Schedules []Schedule `json:"schedules"`
 }
 
 type TeamCreate struct {

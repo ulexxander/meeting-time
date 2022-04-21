@@ -39,7 +39,7 @@ go run ./cmd/meeting-time/ -addr=:4000
 
 ```sh
 # Adding database migration.
-migrate create -ext sql -dir storage/migrations -seq migration_name
+migrate create -ext sql -dir ./storage/migrations -seq migration_name
 ```
 
 ## Links
