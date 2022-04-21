@@ -1,7 +1,7 @@
 package graphql
 
 import (
-	"github.com/ulexxander/meeting-time/storage"
+	"github.com/ulexxander/meeting-time/services"
 )
 
 // This file will not be regenerated automatically.
@@ -9,5 +9,5 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	TeamsStore storage.TeamsStore
+	TeamsService *services.TeamsService
 }

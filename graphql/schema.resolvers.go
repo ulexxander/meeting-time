@@ -12,7 +12,7 @@ import (
 )
 
 func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreate) (int, error) {
-	id, err := r.TeamsStore.Create(storage.TeamCreateParams{
+	id, err := r.TeamsService.Create(storage.TeamCreateParams{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -22,7 +22,7 @@ func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreat
 }
 
 func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
-	item, err := r.TeamsStore.GetByID(id)
+	item, err := r.TeamsService.GetByID(id)
 	if err != nil {
 		return nil, err
 	}

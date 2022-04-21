@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/ulexxander/meeting-time/graphql"
 	"github.com/ulexxander/meeting-time/graphql/generated"
+	"github.com/ulexxander/meeting-time/services"
 	"github.com/ulexxander/meeting-time/storage"
 
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -76,11 +77,13 @@ func run(log *logrus.Logger) error {
 	}
 	defer db.Close()
 
-	teamsStore := storage.TeamsStore{DB: db}
+	teamsStore := &storage.TeamsStore{DB: db}
+
+	teamsService := services.NewTeamsService(teamsStore)
 
 	schema := generated.NewExecutableSchema(generated.Config{
 		Resolvers: &graphql.Resolver{
-			TeamsStore: teamsStore,
+			TeamsService: teamsService,
 		},
 	})
 	server := handler.NewDefaultServer(schema)

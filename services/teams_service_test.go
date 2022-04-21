@@ -1,23 +1,25 @@
-package storage_test
+package services_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/ulexxander/meeting-time/services"
 	"github.com/ulexxander/meeting-time/storage"
 )
 
-func TestTeamsStore(t *testing.T) {
+func TestTeamsService(t *testing.T) {
 	db := setupDB(t)
-	store := storage.TeamsStore{DB: db}
+	store := &storage.TeamsStore{DB: db}
+	service := services.NewTeamsService(store)
 
-	_, err := store.GetByID(123)
+	_, err := service.GetByID(123)
 	require.ErrorIs(t, err, storage.ErrNoTeam)
 
-	createdOrgID, err := store.Create(storage.TeamCreateParams{Name: "First!"})
+	createdOrgID, err := service.Create(storage.TeamCreateParams{Name: "First!"})
 	require.NoError(t, err)
 
-	orgByID, err := store.GetByID(createdOrgID)
+	orgByID, err := service.GetByID(createdOrgID)
 	require.NoError(t, err)
 
 	require.Equal(t, createdOrgID, orgByID.ID)

@@ -1,4 +1,4 @@
-package storage_test
+package services_test
 
 import (
 	"flag"
@@ -44,7 +44,7 @@ func setupDB(t *testing.T) *sqlx.DB {
 	migrationsDriver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	require.NoError(t, err)
 
-	migrations, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", migrationsDriver)
+	migrations, err := migrate.NewWithDatabaseInstance("file://../storage/migrations", "postgres", migrationsDriver)
 	require.NoError(t, err)
 
 	err = migrations.Down()
