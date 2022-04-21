@@ -18,6 +18,8 @@ jobs:
     services:
       postgres:
         image: postgres:14
+        ports:
+          - 5432:5432
         env:
           POSTGRES_USER: meeting-time
           POSTGRES_PASSWORD: 123
@@ -30,4 +32,4 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
       - uses: actions/checkout@v2
-      - run: go test ./services -postgres-host=postgres
+      - run: go test ./services
