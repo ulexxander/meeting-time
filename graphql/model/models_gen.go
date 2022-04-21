@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-type Organization struct {
+type Team struct {
 	ID        int        `json:"id"`
 	Name      string     `json:"name"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
 }
 
-type OrganizationCreate struct {
+type TeamCreate struct {
 	Name string `json:"name"`
 }

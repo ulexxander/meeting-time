@@ -1,6 +1,6 @@
 scalar Time
 
-type Organization {
+type Team {
   id: ID!
   name: String!
   createdAt: Time!
@@ -8,13 +8,13 @@ type Organization {
 }
 
 type Query {
-  organizationByID(id: ID!): Organization
+  teamByID(id: ID!): Team
 }
 
-input OrganizationCreate {
+input TeamCreate {
   name: String!
 }
 
 type Mutation {
-  createOrganization(input: OrganizationCreate!): ID!
+  teamCreate(input: TeamCreate!): ID!
 }

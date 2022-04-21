@@ -76,11 +76,11 @@ func run(log *logrus.Logger) error {
 	}
 	defer db.Close()
 
-	organizationsStore := storage.OrganizationsStore{DB: db}
+	teamsStore := storage.TeamsStore{DB: db}
 
 	schema := generated.NewExecutableSchema(generated.Config{
 		Resolvers: &graphql.Resolver{
-			OrganizationsStore: organizationsStore,
+			TeamsStore: teamsStore,
 		},
 	})
 	server := handler.NewDefaultServer(schema)

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Organization struct {
+type Team struct {
 	ID        int
 	Name      string
 	CreatedAt time.Time

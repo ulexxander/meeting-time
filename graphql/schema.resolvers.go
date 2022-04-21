@@ -11,8 +11,8 @@ import (
 	"github.com/ulexxander/meeting-time/storage"
 )
 
-func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.OrganizationCreate) (int, error) {
-	id, err := r.OrganizationsStore.Create(storage.OrganizationInsertParams{
+func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreate) (int, error) {
+	id, err := r.TeamsStore.Create(storage.TeamCreateParams{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -21,12 +21,12 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.O
 	return id, nil
 }
 
-func (r *queryResolver) OrganizationByID(ctx context.Context, id int) (*model.Organization, error) {
-	item, err := r.OrganizationsStore.GetByID(id)
+func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
+	item, err := r.TeamsStore.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Organization{
+	return &model.Team{
 		ID:        item.ID,
 		Name:      item.Name,
 		CreatedAt: item.CreatedAt,

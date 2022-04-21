@@ -7,14 +7,14 @@ import (
 	"github.com/ulexxander/meeting-time/storage"
 )
 
-func TestOrganizationsStore(t *testing.T) {
+func TestTeamsStore(t *testing.T) {
 	db := setupDB(t)
-	store := storage.OrganizationsStore{DB: db}
+	store := storage.TeamsStore{DB: db}
 
 	_, err := store.GetByID(123)
-	require.ErrorIs(t, err, storage.ErrNoOrganization)
+	require.ErrorIs(t, err, storage.ErrNoTeam)
 
-	createdOrgID, err := store.Create(storage.OrganizationInsertParams{Name: "First!"})
+	createdOrgID, err := store.Create(storage.TeamCreateParams{Name: "First!"})
 	require.NoError(t, err)
 
 	orgByID, err := store.GetByID(createdOrgID)
