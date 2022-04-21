@@ -22,7 +22,7 @@ jobs:
           POSTGRES_USER: meeting-time
           POSTGRES_PASSWORD: 123
           POSTGRES_DB: meeting-time
-        options: >
+        options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
