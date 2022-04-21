@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -33,8 +34,21 @@ func setupDB(t *testing.T) *sqlx.DB {
 		*flagPostgresSSLMode,
 	)
 
-	db, err := sqlx.Connect("postgres", dsn)
-	require.NoError(t, err)
+	const attempts = 5
+	var db *sqlx.DB
+	for i := 0; i < attempts; i++ {
+		var err error
+		db, err = sqlx.Connect("postgres", dsn)
+		if err != nil {
+			t.Logf("Error connecting to Postgres, attempts left: %d", attempts-(i+1))
+			time.Sleep(time.Second)
+			continue
+		}
+		break
+	}
+	if db == nil {
+		require.Fail(t, "Could not connect to Postgres")
+	}
 	t.Cleanup(func() {
 		if err := db.Close(); err != nil {
 			t.Log("error closing db:", err)
