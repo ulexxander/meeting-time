@@ -3,14 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/ulexxander/meeting-time/graphql"
 	"github.com/ulexxander/meeting-time/graphql/generated"
 	"github.com/ulexxander/meeting-time/storage"
@@ -21,13 +21,14 @@ import (
 )
 
 func main() {
-	log := log.New(os.Stdout, "", log.LstdFlags)
+	log := logrus.New()
 	if err := run(log); err != nil {
-		log.Fatalln("Fatal error:", err)
+		log.WithError(err).Fatal("Fatal error")
 	}
 }
 
 type flags struct {
+	logLevel         string
 	addr             string
 	postgresHost     string
 	postgresPort     int
@@ -39,6 +40,7 @@ type flags struct {
 
 func parseFlags() *flags {
 	var flags flags
+	flag.StringVar(&flags.logLevel, "log-level", logrus.TraceLevel.String(), "Log level, available: "+logLevels())
 	flag.StringVar(&flags.addr, "addr", ":80", "HTTP server address")
 	flag.StringVar(&flags.postgresHost, "postgres-host", "localhost", "PostgreSQL host")
 	flag.IntVar(&flags.postgresPort, "postgres-port", 5432, "PostgreSQL port")
@@ -50,9 +52,23 @@ func parseFlags() *flags {
 	return &flags
 }
 
-func run(log *log.Logger) error {
-	log.Print("Parsing flags")
+func logLevels() string {
+	var levels []string
+	for _, l := range logrus.AllLevels {
+		levels = append(levels, l.String())
+	}
+	return strings.Join(levels, ", ")
+}
+
+func run(log *logrus.Logger) error {
+	log.Info("Parsing flags")
 	flags := parseFlags()
+
+	logLevel, err := logrus.ParseLevel(flags.logLevel)
+	if err != nil {
+		return fmt.Errorf("parsing log level: %w", err)
+	}
+	log.SetLevel(logLevel)
 
 	db, err := setupDB(flags, log)
 	if err != nil {
@@ -71,9 +87,9 @@ func run(log *log.Logger) error {
 
 	http.Handle("/query", server)
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	log.Print("GraphQL playground is enabled")
+	log.Warn("GraphQL playground is enabled")
 
-	log.Println("Starting HTTP server on", flags.addr)
+	log.WithField("addr", flags.addr).Info("Starting HTTP server")
 	if err := http.ListenAndServe(flags.addr, nil); err != nil {
 		return fmt.Errorf("listening HTTP: %w", err)
 	}
@@ -81,7 +97,7 @@ func run(log *log.Logger) error {
 	return nil
 }
 
-func setupDB(flags *flags, log *log.Logger) (*sqlx.DB, error) {
+func setupDB(flags *flags, log *logrus.Logger) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s database=%s sslmode=%s",
 		flags.postgresHost,
@@ -92,7 +108,13 @@ func setupDB(flags *flags, log *log.Logger) (*sqlx.DB, error) {
 		flags.postgresSSLMode,
 	)
 
-	log.Println("Connecting to Postgres with DSN", dsn)
+	log.WithFields(logrus.Fields{
+		"host":     flags.postgresHost,
+		"port":     flags.postgresPort,
+		"user":     flags.postgresUser,
+		"database": flags.postgresDatabase,
+		"sslMode":  flags.postgresSSLMode,
+	}).Info("Connecting to Postgres")
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("connecting to Postgres: %w", err)
@@ -108,7 +130,15 @@ func setupDB(flags *flags, log *log.Logger) (*sqlx.DB, error) {
 		return nil, fmt.Errorf("instanciating migrations: %w", err)
 	}
 
-	log.Println("Running migrations")
+	version, dirty, err := migrations.Version()
+	if err != nil {
+		return nil, fmt.Errorf("querying migrations version: %w", err)
+	}
+
+	log.WithFields(logrus.Fields{
+		"version": version,
+		"dirty":   dirty,
+	}).Info("Running migrations")
 	err = migrations.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		return nil, fmt.Errorf("running migrations: %w", err)
