@@ -1,25 +1,44 @@
 package storage
 
+import (
+	"database/sql"
+	"errors"
+
+	"github.com/jmoiron/sqlx"
+)
+
+var ErrNoOrganization = errors.New("organization does not exist")
+
 type OrganizationsStore struct {
-	*Store
+	DB *sqlx.DB
 }
 
 type OrganizationInsertParams struct {
 	Name string
 }
 
-func (os *OrganizationsStore) GetByID(id uint) (*Organization, error) {
+const organizationGetByID = `SELECT * FROM organizations
+WHERE id = $1`
+
+func (os *OrganizationsStore) GetByID(id int) (*Organization, error) {
 	var item Organization
-	if err := os.DB.First(&item, id).Error; err != nil {
-		return nil, os.mapError(err)
+	if err := os.DB.Get(&item, organizationGetByID, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrNoOrganization
+		}
+		return nil, err
 	}
 	return &item, nil
 }
 
-func (os *OrganizationsStore) Create(params OrganizationInsertParams) (*Organization, error) {
-	item := Organization{Name: params.Name}
-	if err := os.DB.Create(&item).Error; err != nil {
-		return nil, err
+const organizationsCreate = `INSERT INTO organizations (name)
+VALUES ($1)
+RETURNING id`
+
+func (os *OrganizationsStore) Create(params OrganizationInsertParams) (int, error) {
+	var id int
+	if err := os.DB.Get(&id, organizationsCreate, params.Name); err != nil {
+		return 0, err
 	}
-	return &item, nil
+	return id, nil
 }

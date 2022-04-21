@@ -2,9 +2,15 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Organization struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID        int        `json:"id"`
+	Name      string     `json:"name"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
 }
 
 type OrganizationCreate struct {

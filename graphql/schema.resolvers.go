@@ -11,27 +11,26 @@ import (
 	"github.com/ulexxander/meeting-time/storage"
 )
 
-func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.OrganizationCreate) (*model.Organization, error) {
-	item, err := r.OrganizationsStore.Create(storage.OrganizationInsertParams{
+func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.OrganizationCreate) (int, error) {
+	id, err := r.OrganizationsStore.Create(storage.OrganizationInsertParams{
 		Name: input.Name,
 	})
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &model.Organization{
-		ID:   int(item.ID),
-		Name: item.Name,
-	}, nil
+	return id, nil
 }
 
 func (r *queryResolver) OrganizationByID(ctx context.Context, id int) (*model.Organization, error) {
-	item, err := r.OrganizationsStore.GetByID(uint(id))
+	item, err := r.OrganizationsStore.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 	return &model.Organization{
-		ID:   int(item.ID),
-		Name: item.Name,
+		ID:        item.ID,
+		Name:      item.Name,
+		CreatedAt: item.CreatedAt,
+		UpdatedAt: item.UpdatedAt,
 	}, nil
 }
 

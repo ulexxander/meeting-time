@@ -1,8 +1,12 @@
 package storage
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
 type Organization struct {
-	gorm.Model
-	Name string
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt *time.Time
 }

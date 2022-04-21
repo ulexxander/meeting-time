@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -47,8 +48,10 @@ type ComplexityRoot struct {
 	}
 
 	Organization struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Query struct {
@@ -57,7 +60,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateOrganization(ctx context.Context, input model.OrganizationCreate) (*model.Organization, error)
+	CreateOrganization(ctx context.Context, input model.OrganizationCreate) (int, error)
 }
 type QueryResolver interface {
 	OrganizationByID(ctx context.Context, id int) (*model.Organization, error)
@@ -90,6 +93,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateOrganization(childComplexity, args["input"].(model.OrganizationCreate)), true
 
+	case "Organization.createdAt":
+		if e.complexity.Organization.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Organization.CreatedAt(childComplexity), true
+
 	case "Organization.id":
 		if e.complexity.Organization.ID == nil {
 			break
@@ -103,6 +113,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Organization.Name(childComplexity), true
+
+	case "Organization.updatedAt":
+		if e.complexity.Organization.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Organization.UpdatedAt(childComplexity), true
 
 	case "Query.organizationByID":
 		if e.complexity.Query.OrganizationByID == nil {
@@ -180,9 +197,13 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graphql/schema.graphql", Input: `type Organization {
+	{Name: "graphql/schema.graphql", Input: `scalar Time
+
+type Organization {
   id: ID!
   name: String!
+  createdAt: Time!
+  updatedAt: Time
 }
 
 type Query {
@@ -194,7 +215,7 @@ input OrganizationCreate {
 }
 
 type Mutation {
-  createOrganization(input: OrganizationCreate!): Organization!
+  createOrganization(input: OrganizationCreate!): ID!
 }
 `, BuiltIn: false},
 }
@@ -324,9 +345,9 @@ func (ec *executionContext) _Mutation_createOrganization(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Organization)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNOrganization2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐOrganization(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Organization_id(ctx context.Context, field graphql.CollectedField, obj *model.Organization) (ret graphql.Marshaler) {
@@ -397,6 +418,73 @@ func (ec *executionContext) _Organization_name(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Organization_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Organization) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Organization_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Organization) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Organization",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_organizationByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1796,6 +1884,23 @@ func (ec *executionContext) _Organization(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Organization_createdAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Organization_updatedAt(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2324,20 +2429,6 @@ func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.Selectio
 	return res
 }
 
-func (ec *executionContext) marshalNOrganization2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐOrganization(ctx context.Context, sel ast.SelectionSet, v model.Organization) graphql.Marshaler {
-	return ec._Organization(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNOrganization2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐOrganization(ctx context.Context, sel ast.SelectionSet, v *model.Organization) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Organization(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNOrganizationCreate2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐOrganizationCreate(ctx context.Context, v interface{}) (model.OrganizationCreate, error) {
 	res, err := ec.unmarshalInputOrganizationCreate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2350,6 +2441,21 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2657,6 +2763,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 

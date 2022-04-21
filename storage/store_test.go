@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
-	"github.com/ulexxander/meeting-time/storage"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 var (
@@ -17,20 +19,43 @@ var (
 	flagPostgresUser     = flag.String("postgres-user", "meeting-time", "PostgreSQL user")
 	flagPostgresPassword = flag.String("postgres-password", "123", "PostgreSQL password")
 	flagPostgresDatabase = flag.String("postgres-database", "meeting-time", "PostgreSQL database name")
+	flagPostgresSSLMode  = flag.String("postgres-ssl-mode", "disable", "PostgreSQL SSL mode")
 )
 
-func setupDB(t *testing.T) *gorm.DB {
+func setupDB(t *testing.T) *sqlx.DB {
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s database=%s",
+		"host=%s port=%d user=%s password=%s database=%s sslmode=%s",
 		*flagPostgresHost,
 		*flagPostgresPort,
 		*flagPostgresUser,
 		*flagPostgresPassword,
 		*flagPostgresDatabase,
+		*flagPostgresSSLMode,
 	)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	db, err := sqlx.Connect("postgres", dsn)
 	require.NoError(t, err)
-	err = db.AutoMigrate(storage.Organization{})
+	t.Cleanup(func() {
+		if err := db.Close(); err != nil {
+			t.Log("error closing db:", err)
+		}
+	})
+
+	migrationsDriver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	require.NoError(t, err)
+
+	migrations, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", migrationsDriver)
+	require.NoError(t, err)
+
+	err = migrations.Down()
+	if err != migrate.ErrNoChange {
+		require.NoError(t, err)
+	}
+
+	err = migrations.Up()
+	if err != migrate.ErrNoChange {
+		require.NoError(t, err)
+	}
+
 	return db
 }

@@ -1,6 +1,10 @@
+scalar Time
+
 type Organization {
   id: ID!
   name: String!
+  createdAt: Time!
+  updatedAt: Time
 }
 
 type Query {
@@ -12,5 +16,5 @@ input OrganizationCreate {
 }
 
 type Mutation {
-  createOrganization(input: OrganizationCreate!): Organization!
+  createOrganization(input: OrganizationCreate!): ID!
 }

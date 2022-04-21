@@ -8,7 +8,8 @@ Backend:
 
 - Go programming language
 - PostgreSQL relational database
-- GORM for accessing the database
+- SQLX for accessing the database
+- Golang Migrate for database migrations
 - GraphQL API
 
 ## Links
