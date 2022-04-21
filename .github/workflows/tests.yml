@@ -19,10 +19,10 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          - POSTGRES_USER=meeting-time
-          - POSTGRES_PASSWORD=123
-          - POSTGRES_DB=meeting-time
-        options: >-
+          POSTGRES_USER: meeting-time
+          POSTGRES_PASSWORD: 123
+          POSTGRES_DB: meeting-time
+        options: >
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
