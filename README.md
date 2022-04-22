@@ -39,8 +39,18 @@ go run ./cmd/meeting-time/ -addr=:4000
 ### Adding new features
 
 ```sh
-# Adding database migration.
+# Creating database migration.
 migrate create -ext sql -dir ./storage/migrations -seq migration_name
+```
+
+```sh
+# Generating Go database types and methods.
+sqlc generate
+```
+
+```sh
+# Generating GraphQL types and resolvers.
+gqlgen generate
 ```
 
 ## Links
