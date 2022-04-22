@@ -1,11 +1,11 @@
 package graphql
 
 import (
+	"github.com/ulexxander/meeting-time/db"
 	"github.com/ulexxander/meeting-time/graphql/model"
-	"github.com/ulexxander/meeting-time/storage"
 )
 
-func convertSchedule(item *storage.Schedule) *model.Schedule {
+func convertSchedule(item *db.Schedule) *model.Schedule {
 	return &model.Schedule{
 		ID:        item.ID,
 		TeamID:    item.TeamID,
@@ -17,7 +17,7 @@ func convertSchedule(item *storage.Schedule) *model.Schedule {
 	}
 }
 
-func convertSchedules(items []storage.Schedule) []model.Schedule {
+func convertSchedules(items []db.Schedule) []model.Schedule {
 	converted := make([]model.Schedule, len(items))
 	for i := range items {
 		converted[i] = *convertSchedule(&items[i])

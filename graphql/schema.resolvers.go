@@ -6,15 +6,13 @@ package graphql
 import (
 	"context"
 
+	"github.com/ulexxander/meeting-time/db"
 	"github.com/ulexxander/meeting-time/graphql/generated"
 	"github.com/ulexxander/meeting-time/graphql/model"
-	"github.com/ulexxander/meeting-time/storage"
 )
 
 func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreate) (int, error) {
-	id, err := r.TeamsService.Create(storage.TeamCreateParams{
-		Name: input.Name,
-	})
+	id, err := r.TeamsService.TeamCreate(ctx, input.Name)
 	if err != nil {
 		return 0, err
 	}
@@ -22,7 +20,7 @@ func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreat
 }
 
 func (r *mutationResolver) ScheduleCreate(ctx context.Context, input model.ScheduleCreate) (int, error) {
-	id, err := r.SchedulesService.Create(storage.ScheduleCreateParams{
+	id, err := r.SchedulesService.ScheduleCreate(ctx, db.ScheduleCreateParams{
 		TeamID:   input.TeamID,
 		Name:     input.Name,
 		StartsAt: input.StartsAt,
@@ -35,7 +33,7 @@ func (r *mutationResolver) ScheduleCreate(ctx context.Context, input model.Sched
 }
 
 func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
-	item, err := r.TeamsService.GetByID(id)
+	item, err := r.TeamsService.TeamByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +46,7 @@ func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, erro
 }
 
 func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedule, error) {
-	item, err := r.SchedulesService.GetByID(id)
+	item, err := r.SchedulesService.ScheduleByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +54,7 @@ func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedu
 }
 
 func (r *teamResolver) Schedules(ctx context.Context, obj *model.Team) ([]model.Schedule, error) {
-	items, err := r.SchedulesService.GetByTeam(obj.ID)
+	items, err := r.SchedulesService.SchedulesByTeam(ctx, obj.ID)
 	if err != nil {
 		return nil, err
 	}

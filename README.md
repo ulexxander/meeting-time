@@ -8,7 +8,7 @@ Backend:
 
 - Go programming language
 - PostgreSQL relational database
-- SQLX for accessing the database
+- SQLC for accessing the database
 - Golang Migrate for database migrations
 - GraphQL API
 
@@ -19,8 +19,9 @@ Backend:
 - Go 1.17
 - Docker
 - Docker Compose
-- [gqlgen](https://gqlgen.com)
+- [sqlc](https://github.com/kyleconroy/sqlc)
 - [migrate](https://github.com/golang-migrate/migrate)
+- [gqlgen](https://github.com/99designs/gqlgen)
 
 ### Setup
 

@@ -1,0 +1,18 @@
+version: "1"
+
+packages:
+  - name: "db"
+    path: "./db"
+    queries: "./db/queries.sql"
+    schema: "./db/migrations"
+    engine: "postgresql"
+
+overrides:
+  - db_type: "pg_catalog.int8"
+    go_type:
+      type: "int"
+  - db_type: "timestamptz"
+    nullable: true
+    go_type:
+      type: "time.Time"
+      pointer: true

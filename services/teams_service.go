@@ -1,21 +1,35 @@
 package services
 
-import "github.com/ulexxander/meeting-time/storage"
+import (
+	"context"
+	"database/sql"
+	"errors"
+
+	"github.com/ulexxander/meeting-time/db"
+)
+
+var ErrNoTeam = errors.New("team does not exist")
 
 type TeamsService struct {
-	teamsStore *storage.TeamsStore
+	queries *db.Queries
 }
 
-func NewTeamsService(ts *storage.TeamsStore) *TeamsService {
+func NewTeamsService(queries *db.Queries) *TeamsService {
 	return &TeamsService{
-		teamsStore: ts,
+		queries: queries,
 	}
 }
 
-func (ts *TeamsService) GetByID(id int) (*storage.Team, error) {
-	return ts.teamsStore.GetByID(id)
+func (ts *TeamsService) TeamByID(ctx context.Context, id int) (*db.Team, error) {
+	item, err := ts.queries.TeamByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoTeam
+		}
+	}
+	return &item, nil
 }
 
-func (ts *TeamsService) Create(params storage.TeamCreateParams) (int, error) {
-	return ts.teamsStore.Create(params)
+func (ts *TeamsService) TeamCreate(ctx context.Context, name string) (int, error) {
+	return ts.queries.TeamCreate(ctx, name)
 }

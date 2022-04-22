@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
@@ -9,12 +10,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"github.com/ulexxander/meeting-time/db"
 	"github.com/ulexxander/meeting-time/graphql"
 	"github.com/ulexxander/meeting-time/graphql/generated"
 	"github.com/ulexxander/meeting-time/services"
-	"github.com/ulexxander/meeting-time/storage"
 
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -71,17 +71,16 @@ func run(log *logrus.Logger) error {
 	}
 	log.SetLevel(logLevel)
 
-	db, err := setupDB(flags, log)
+	postgresDB, err := setupDB(flags, log)
 	if err != nil {
 		return fmt.Errorf("setting up database: %w", err)
 	}
-	defer db.Close()
+	defer postgresDB.Close()
 
-	teamsStore := &storage.TeamsStore{DB: db}
-	schedulesStore := &storage.SchedulesStore{DB: db}
+	queries := db.New(postgresDB)
 
-	teamsService := services.NewTeamsService(teamsStore)
-	schedulesService := services.NewSchedulesService(schedulesStore)
+	teamsService := services.NewTeamsService(queries)
+	schedulesService := services.NewSchedulesService(queries)
 
 	schema := generated.NewExecutableSchema(generated.Config{
 		Resolvers: &graphql.Resolver{
@@ -103,7 +102,7 @@ func run(log *logrus.Logger) error {
 	return nil
 }
 
-func setupDB(flags *flags, log *logrus.Logger) (*sqlx.DB, error) {
+func setupDB(flags *flags, log *logrus.Logger) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s database=%s sslmode=%s",
 		flags.postgresHost,
@@ -121,17 +120,21 @@ func setupDB(flags *flags, log *logrus.Logger) (*sqlx.DB, error) {
 		"database": flags.postgresDatabase,
 		"sslMode":  flags.postgresSSLMode,
 	}).Info("Connecting to Postgres")
-	db, err := sqlx.Connect("postgres", dsn)
+	postgresDB, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("connecting to Postgres: %w", err)
 	}
 
-	migrationsDriver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	if err := postgresDB.Ping(); err != nil {
+		return nil, fmt.Errorf("pinging Postgres: %w", err)
+	}
+
+	migrationsDriver, err := postgres.WithInstance(postgresDB, &postgres.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("instanciating Postgres migrations driver: %w", err)
 	}
 
-	migrations, err := migrate.NewWithDatabaseInstance("file://storage/migrations", "postgres", migrationsDriver)
+	migrations, err := migrate.NewWithDatabaseInstance("file://db/migrations", "postgres", migrationsDriver)
 	if err != nil {
 		return nil, fmt.Errorf("instanciating migrations: %w", err)
 	}
@@ -150,5 +153,5 @@ func setupDB(flags *flags, log *logrus.Logger) (*sqlx.DB, error) {
 		return nil, fmt.Errorf("running migrations: %w", err)
 	}
 
-	return db, nil
+	return postgresDB, nil
 }

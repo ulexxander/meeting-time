@@ -1,6 +1,8 @@
 package services_test
 
 import (
+	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"testing"
@@ -8,10 +10,16 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
+	"github.com/ulexxander/meeting-time/db"
 )
+
+func testContext(t *testing.T) context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	return ctx
+}
 
 var (
 	flagPostgresHost     = flag.String("postgres-host", "localhost", "PostgreSQL host")
@@ -22,7 +30,7 @@ var (
 	flagPostgresSSLMode  = flag.String("postgres-ssl-mode", "disable", "PostgreSQL SSL mode")
 )
 
-func setupDB(t *testing.T) *sqlx.DB {
+func setupQueries(t *testing.T) *db.Queries {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s database=%s sslmode=%s",
 		*flagPostgresHost,
@@ -33,18 +41,21 @@ func setupDB(t *testing.T) *sqlx.DB {
 		*flagPostgresSSLMode,
 	)
 
-	db, err := sqlx.Connect("postgres", dsn)
+	postgresDB, err := sql.Open("postgres", dsn)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		if err := db.Close(); err != nil {
+		if err := postgresDB.Close(); err != nil {
 			t.Log("error closing db:", err)
 		}
 	})
 
-	migrationsDriver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	err = postgresDB.Ping()
 	require.NoError(t, err)
 
-	migrations, err := migrate.NewWithDatabaseInstance("file://../storage/migrations", "postgres", migrationsDriver)
+	migrationsDriver, err := postgres.WithInstance(postgresDB, &postgres.Config{})
+	require.NoError(t, err)
+
+	migrations, err := migrate.NewWithDatabaseInstance("file://../db/migrations", "postgres", migrationsDriver)
 	require.NoError(t, err)
 
 	err = migrations.Down()
@@ -57,5 +68,5 @@ func setupDB(t *testing.T) *sqlx.DB {
 		require.NoError(t, err)
 	}
 
-	return db
+	return db.New(postgresDB)
 }

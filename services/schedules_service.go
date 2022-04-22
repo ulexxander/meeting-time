@@ -1,25 +1,39 @@
 package services
 
-import "github.com/ulexxander/meeting-time/storage"
+import (
+	"context"
+	"database/sql"
+	"errors"
+
+	"github.com/ulexxander/meeting-time/db"
+)
+
+var ErrNoSchedule = errors.New("schedule does not exist")
 
 type SchedulesService struct {
-	schedulesStore *storage.SchedulesStore
+	queries *db.Queries
 }
 
-func NewSchedulesService(ss *storage.SchedulesStore) *SchedulesService {
+func NewSchedulesService(queries *db.Queries) *SchedulesService {
 	return &SchedulesService{
-		schedulesStore: ss,
+		queries: queries,
 	}
 }
 
-func (ss *SchedulesService) GetByID(id int) (*storage.Schedule, error) {
-	return ss.schedulesStore.GetByID(id)
+func (ss *SchedulesService) ScheduleByID(ctx context.Context, id int) (*db.Schedule, error) {
+	item, err := ss.queries.ScheduleByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoSchedule
+		}
+	}
+	return &item, nil
 }
 
-func (ss *SchedulesService) GetByTeam(teamID int) ([]storage.Schedule, error) {
-	return ss.schedulesStore.GetByTeam(teamID)
+func (ss *SchedulesService) SchedulesByTeam(ctx context.Context, teamID int) ([]db.Schedule, error) {
+	return ss.queries.SchedulesByTeam(ctx, teamID)
 }
 
-func (ss *SchedulesService) Create(params storage.ScheduleCreateParams) (int, error) {
-	return ss.schedulesStore.Create(params)
+func (ss *SchedulesService) ScheduleCreate(ctx context.Context, params db.ScheduleCreateParams) (int, error) {
+	return ss.queries.ScheduleCreate(ctx, params)
 }

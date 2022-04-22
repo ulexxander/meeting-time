@@ -2,6 +2,6 @@
 CREATE TABLE teams (
   id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   name text NOT NULL,
-  createdAt timestamptz NOT NULL DEFAULT NOW(),
-  updatedAt timestamptz
+  created_at timestamptz NOT NULL DEFAULT NOW(),
+  updated_at timestamptz
 );
