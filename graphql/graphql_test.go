@@ -3,12 +3,14 @@ package graphql_test
 import (
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/stretchr/testify/require"
 	"github.com/ulexxander/meeting-time/graphql"
 	"github.com/ulexxander/meeting-time/graphql/client"
 	"github.com/ulexxander/meeting-time/graphql/generated"
+	"github.com/ulexxander/meeting-time/graphql/model"
 	"github.com/ulexxander/meeting-time/services"
 	"github.com/ulexxander/meeting-time/testutil"
 )
@@ -57,6 +59,105 @@ func TestGraphQL(t *testing.T) {
 		err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
 		require.NoError(t, err)
 		require.Nil(t, res.MeetingByID)
+	})
+
+	var teamID int
+	t.Run("creating team", func(t *testing.T) {
+		var res struct {
+			TeamCreate int `json:"teamCreate"`
+		}
+		query := `mutation ($input: TeamCreate!) {
+			teamCreate(input: $input)
+		}`
+		input := model.TeamCreate{
+			Name: "My team!",
+		}
+		err := c.Query(ctx, query, client.Variables{"input": input}, &res)
+		require.NoError(t, err)
+		teamID = res.TeamCreate
+	})
+
+	scheduleStartsAt, _ := time.Parse(time.Kitchen, "6:30AM")
+	scheduleEndsAt, _ := time.Parse(time.Kitchen, "7:00AM")
+	var scheduleID int
+	t.Run("creating schedule", func(t *testing.T) {
+		var res struct {
+			ScheduleCreate int `json:"scheduleCreate"`
+		}
+		query := `mutation ($input: ScheduleCreate!) {
+			scheduleCreate(input: $input)
+		}`
+		input := model.ScheduleCreate{
+			TeamID:   teamID,
+			Name:     "My schedule!",
+			StartsAt: scheduleStartsAt,
+			EndsAt:   scheduleEndsAt,
+		}
+		err := c.Query(ctx, query, client.Variables{"input": input}, &res)
+		require.NoError(t, err)
+		scheduleID = res.ScheduleCreate
+	})
+
+	t.Run("creating meeting", func(t *testing.T) {
+		var res struct {
+			MeetingCreate int `json:"meetingCreate"`
+		}
+		query := `mutation ($input: MeetingCreate!) {
+			meetingCreate(input: $input)
+		}`
+		startedAt := time.Now()
+		endedAt := startedAt.Add(time.Hour)
+		input := model.MeetingCreate{
+			ScheduleID: scheduleID,
+			StartedAt:  startedAt,
+			EndedAt:    endedAt,
+		}
+		err := c.Query(ctx, query, client.Variables{"input": input}, &res)
+		require.NoError(t, err)
+	})
+
+	t.Run("query team, schedules, meetings", func(t *testing.T) {
+		var res struct {
+			TeamByID struct {
+				model.Team
+				Schedules []model.Schedule `json:"schedules"`
+			} `json:"teamByID"`
+		}
+		query := `query ($id: ID!) {
+			teamByID(id: $id) {
+				id
+				name
+				createdAt
+				updatedAt
+				schedules {
+					id
+					teamId
+					name
+					startsAt
+					endsAt
+					createdAt
+					updatedAt
+				}
+			}
+		}`
+		err := c.Query(ctx, query, client.Variables{"id": teamID}, &res)
+		require.NoError(t, err)
+
+		require.Equal(t, teamID, res.TeamByID.ID)
+		require.Equal(t, "My team!", res.TeamByID.Name)
+		require.NotZero(t, res.TeamByID.CreatedAt)
+		require.Nil(t, res.TeamByID.UpdatedAt)
+
+		require.Len(t, res.TeamByID.Schedules, 1)
+		schedule := res.TeamByID.Schedules[0]
+
+		require.Equal(t, scheduleID, schedule.ID)
+		require.Equal(t, teamID, schedule.TeamID)
+		require.Equal(t, "My schedule!", schedule.Name)
+		require.Equal(t, scheduleStartsAt, schedule.StartsAt)
+		require.Equal(t, scheduleEndsAt, schedule.EndsAt)
+		require.NotZero(t, schedule.CreatedAt)
+		require.Nil(t, schedule.UpdatedAt)
 	})
 }
 
