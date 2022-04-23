@@ -17,17 +17,47 @@ func TestGraphQL(t *testing.T) {
 	ctx := testutil.Context(t)
 	c := setupClient(t)
 
-	var res struct {
-		TeamByID map[string]interface{}
-	}
-	query := `query NonexistentTeam ($id: ID!) {
-		teamByID(id: $id) {
-			id
+	t.Run("nonexistent team", func(t *testing.T) {
+		var res struct {
+			TeamByID map[string]interface{} `json:"teamByID"`
 		}
-	}`
-	err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
-	require.NoError(t, err)
-	require.Nil(t, res.TeamByID)
+		query := `query ($id: ID!) {
+			teamByID(id: $id) {
+				id
+			}
+		}`
+		err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
+		require.NoError(t, err)
+		require.Nil(t, res.TeamByID)
+	})
+
+	t.Run("nonexistent schedule", func(t *testing.T) {
+		var res struct {
+			ScheduleByID map[string]interface{} `json:"scheduleByID"`
+		}
+		query := `query ($id: ID!) {
+			scheduleByID(id: $id) {
+				id
+			}
+		}`
+		err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
+		require.NoError(t, err)
+		require.Nil(t, res.ScheduleByID)
+	})
+
+	t.Run("nonexistent meeting", func(t *testing.T) {
+		var res struct {
+			MeetingByID map[string]interface{} `json:"meetingByID"`
+		}
+		query := `query ($id: ID!) {
+			meetingByID(id: $id) {
+				id
+			}
+		}`
+		err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
+		require.NoError(t, err)
+		require.Nil(t, res.MeetingByID)
+	})
 }
 
 func setupClient(t *testing.T) *client.Client {
