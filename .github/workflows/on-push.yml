@@ -3,6 +3,16 @@ name: tests
 on: [push]
 
 jobs:
+  linters:
+    name: linters
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v2
+      - uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.45
+
   tests:
     name: tests
     runs-on: ubuntu-20.04
@@ -23,4 +33,4 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
       - uses: actions/checkout@v2
-      - run: go test ./services ./graphql
+      - run: go test -v ./services ./graphql
