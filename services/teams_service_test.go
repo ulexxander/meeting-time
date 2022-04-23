@@ -5,11 +5,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/ulexxander/meeting-time/services"
+	"github.com/ulexxander/meeting-time/testutil"
 )
 
 func TestTeamsService(t *testing.T) {
-	ctx := testContext(t)
-	queries := setupQueries(t)
+	ctx := testutil.Context(t)
+	queries := testutil.Queries(t)
 	teamsService := services.NewTeamsService(queries)
 
 	_, err := teamsService.TeamByID(ctx, 123)

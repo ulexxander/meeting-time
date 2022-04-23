@@ -1,4 +1,4 @@
-package services_test
+package testutil
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"github.com/ulexxander/meeting-time/db"
 )
 
-func testContext(t *testing.T) context.Context {
+func Context(t *testing.T) context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 	return ctx
@@ -30,7 +30,7 @@ var (
 	flagPostgresSSLMode  = flag.String("postgres-ssl-mode", "disable", "PostgreSQL SSL mode")
 )
 
-func setupQueries(t *testing.T) *db.Queries {
+func Queries(t *testing.T) *db.Queries {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s database=%s sslmode=%s",
 		*flagPostgresHost,
