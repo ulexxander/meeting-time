@@ -28,9 +28,9 @@ type Meeting {
 }
 
 type Query {
-  teamByID(id: ID!): Team!
-  scheduleByID(id: ID!): Schedule!
-  meetingByID(id: ID!): Meeting!
+  teamByID(id: ID!): Team
+  scheduleByID(id: ID!): Schedule
+  meetingByID(id: ID!): Meeting
 }
 
 input TeamCreate {

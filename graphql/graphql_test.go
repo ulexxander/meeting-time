@@ -18,19 +18,16 @@ func TestGraphQL(t *testing.T) {
 	c := setupClient(t)
 
 	var res struct {
-		TeamByID struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"teamByID"`
+		TeamByID map[string]interface{}
 	}
 	query := `query NonexistentTeam ($id: ID!) {
 		teamByID(id: $id) {
 			id
-			name
 		}
 	}`
 	err := c.Query(ctx, query, client.Variables{"id": 123}, &res)
 	require.NoError(t, err)
+	require.Nil(t, res.TeamByID)
 }
 
 func setupClient(t *testing.T) *client.Client {

@@ -406,9 +406,9 @@ type Meeting {
 }
 
 type Query {
-  teamByID(id: ID!): Team!
-  scheduleByID(id: ID!): Schedule!
-  meetingByID(id: ID!): Meeting!
+  teamByID(id: ID!): Team
+  scheduleByID(id: ID!): Schedule
+  meetingByID(id: ID!): Meeting
 }
 
 input TeamCreate {
@@ -949,14 +949,11 @@ func (ec *executionContext) _Query_teamByID(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Team)
 	fc.Result = res
-	return ec.marshalNTeam2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeam(ctx, field.Selections, res)
+	return ec.marshalOTeam2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeam(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_scheduleByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -991,14 +988,11 @@ func (ec *executionContext) _Query_scheduleByID(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Schedule)
 	fc.Result = res
-	return ec.marshalNSchedule2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐSchedule(ctx, field.Selections, res)
+	return ec.marshalOSchedule2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐSchedule(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_meetingByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1033,14 +1027,11 @@ func (ec *executionContext) _Query_meetingByID(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Meeting)
 	fc.Result = res
-	return ec.marshalNMeeting2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeeting(ctx, field.Selections, res)
+	return ec.marshalOMeeting2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeeting(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2998,9 +2989,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_teamByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -3021,9 +3009,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_scheduleByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -3044,9 +3029,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_meetingByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -3716,20 +3698,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNMeeting2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeeting(ctx context.Context, sel ast.SelectionSet, v model.Meeting) graphql.Marshaler {
-	return ec._Meeting(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNMeeting2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeeting(ctx context.Context, sel ast.SelectionSet, v *model.Meeting) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Meeting(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNMeetingCreate2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeetingCreate(ctx context.Context, v interface{}) (model.MeetingCreate, error) {
 	res, err := ec.unmarshalInputMeetingCreate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3783,16 +3751,6 @@ func (ec *executionContext) marshalNSchedule2ᚕgithubᚗcomᚋulexxanderᚋmeet
 	return ret
 }
 
-func (ec *executionContext) marshalNSchedule2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐSchedule(ctx context.Context, sel ast.SelectionSet, v *model.Schedule) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Schedule(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNScheduleCreate2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐScheduleCreate(ctx context.Context, v interface{}) (model.ScheduleCreate, error) {
 	res, err := ec.unmarshalInputScheduleCreate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3811,20 +3769,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNTeam2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeam(ctx context.Context, sel ast.SelectionSet, v model.Team) graphql.Marshaler {
-	return ec._Team(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNTeam2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeam(ctx context.Context, sel ast.SelectionSet, v *model.Team) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Team(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTeamCreate2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeamCreate(ctx context.Context, v interface{}) (model.TeamCreate, error) {
@@ -4126,6 +4070,20 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOMeeting2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐMeeting(ctx context.Context, sel ast.SelectionSet, v *model.Meeting) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Meeting(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSchedule2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐSchedule(ctx context.Context, sel ast.SelectionSet, v *model.Schedule) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Schedule(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4140,6 +4098,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTeam2ᚖgithubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋmodelᚐTeam(ctx context.Context, sel ast.SelectionSet, v *model.Team) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Team(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {

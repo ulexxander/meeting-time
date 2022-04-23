@@ -5,10 +5,12 @@ package graphql
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ulexxander/meeting-time/db"
 	"github.com/ulexxander/meeting-time/graphql/generated"
 	"github.com/ulexxander/meeting-time/graphql/model"
+	"github.com/ulexxander/meeting-time/services"
 )
 
 func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreate) (int, error) {
@@ -47,6 +49,9 @@ func (r *mutationResolver) MeetingCreate(ctx context.Context, input model.Meetin
 func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
 	item, err := r.teamsService.TeamByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, services.ErrNoTeam) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &model.Team{
@@ -60,6 +65,9 @@ func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, erro
 func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedule, error) {
 	item, err := r.schedulesService.ScheduleByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, services.ErrNoSchedule) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return convertSchedule(item), nil
@@ -68,6 +76,9 @@ func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedu
 func (r *queryResolver) MeetingByID(ctx context.Context, id int) (*model.Meeting, error) {
 	item, err := r.meetingsService.MeetingByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, services.ErrNoMeeting) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &model.Meeting{
