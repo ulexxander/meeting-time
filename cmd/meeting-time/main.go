@@ -83,16 +83,17 @@ func run(log *logrus.Logger) error {
 	schedulesService := services.NewSchedulesService(queries)
 	meetingsService := services.NewMeetingsService(queries)
 
-	schema := generated.NewExecutableSchema(generated.Config{
-		Resolvers: &graphql.Resolver{
-			TeamsService:     teamsService,
-			SchedulesService: schedulesService,
-			MeetingsService:  meetingsService,
-		},
+	gqlResolver := graphql.NewResolver(
+		teamsService,
+		schedulesService,
+		meetingsService,
+	)
+	gqlSchema := generated.NewExecutableSchema(generated.Config{
+		Resolvers: gqlResolver,
 	})
-	server := handler.NewDefaultServer(schema)
+	gqlServer := handler.NewDefaultServer(gqlSchema)
 
-	http.Handle("/query", server)
+	http.Handle("/query", gqlServer)
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	log.Warn("GraphQL playground is enabled")
 

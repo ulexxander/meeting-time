@@ -9,7 +9,19 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	TeamsService     *services.TeamsService
-	SchedulesService *services.SchedulesService
-	MeetingsService  *services.MeetingsService
+	teamsService     *services.TeamsService
+	schedulesService *services.SchedulesService
+	meetingsService  *services.MeetingsService
+}
+
+func NewResolver(
+	ts *services.TeamsService,
+	ss *services.SchedulesService,
+	ms *services.MeetingsService,
+) *Resolver {
+	return &Resolver{
+		teamsService:     ts,
+		schedulesService: ss,
+		meetingsService:  ms,
+	}
 }

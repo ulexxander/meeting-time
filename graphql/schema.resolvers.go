@@ -12,7 +12,7 @@ import (
 )
 
 func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreate) (int, error) {
-	id, err := r.TeamsService.TeamCreate(ctx, input.Name)
+	id, err := r.teamsService.TeamCreate(ctx, input.Name)
 	if err != nil {
 		return 0, err
 	}
@@ -20,7 +20,7 @@ func (r *mutationResolver) TeamCreate(ctx context.Context, input model.TeamCreat
 }
 
 func (r *mutationResolver) ScheduleCreate(ctx context.Context, input model.ScheduleCreate) (int, error) {
-	id, err := r.SchedulesService.ScheduleCreate(ctx, db.ScheduleCreateParams{
+	id, err := r.schedulesService.ScheduleCreate(ctx, db.ScheduleCreateParams{
 		TeamID:   input.TeamID,
 		Name:     input.Name,
 		StartsAt: input.StartsAt,
@@ -33,7 +33,7 @@ func (r *mutationResolver) ScheduleCreate(ctx context.Context, input model.Sched
 }
 
 func (r *mutationResolver) MeetingCreate(ctx context.Context, input model.MeetingCreate) (int, error) {
-	id, err := r.MeetingsService.MeetingCreate(ctx, db.MeetingCreateParams{
+	id, err := r.meetingsService.MeetingCreate(ctx, db.MeetingCreateParams{
 		ScheduleID: input.ScheduleID,
 		StartedAt:  input.StartedAt,
 		EndedAt:    input.EndedAt,
@@ -45,7 +45,7 @@ func (r *mutationResolver) MeetingCreate(ctx context.Context, input model.Meetin
 }
 
 func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
-	item, err := r.TeamsService.TeamByID(ctx, id)
+	item, err := r.teamsService.TeamByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, erro
 }
 
 func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedule, error) {
-	item, err := r.SchedulesService.ScheduleByID(ctx, id)
+	item, err := r.schedulesService.ScheduleByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedu
 }
 
 func (r *queryResolver) MeetingByID(ctx context.Context, id int) (*model.Meeting, error) {
-	item, err := r.MeetingsService.MeetingByID(ctx, id)
+	item, err := r.meetingsService.MeetingByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (r *queryResolver) MeetingByID(ctx context.Context, id int) (*model.Meeting
 }
 
 func (r *teamResolver) Schedules(ctx context.Context, obj *model.Team) ([]model.Schedule, error) {
-	items, err := r.SchedulesService.SchedulesByTeam(ctx, obj.ID)
+	items, err := r.schedulesService.SchedulesByTeam(ctx, obj.ID)
 	if err != nil {
 		return nil, err
 	}
