@@ -24,3 +24,22 @@ func convertSchedules(items []db.Schedule) []model.Schedule {
 	}
 	return converted
 }
+
+func convertMeeting(item *db.Meeting) *model.Meeting {
+	return &model.Meeting{
+		ID:         item.ID,
+		ScheduleID: item.ScheduleID,
+		StartedAt:  item.StartedAt,
+		EndedAt:    item.EndedAt,
+		CreatedAt:  item.CreatedAt,
+		UpdatedAt:  item.UpdatedAt,
+	}
+}
+
+func convertMeetings(items []db.Meeting) []model.Meeting {
+	converted := make([]model.Meeting, len(items))
+	for i := range items {
+		converted[i] = *convertMeeting(&items[i])
+	}
+	return converted
+}

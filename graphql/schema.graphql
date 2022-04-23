@@ -16,6 +16,7 @@ type Schedule {
   endsAt: Time!
   createdAt: Time!
   updatedAt: Time
+  meetings: [Meeting!]!
 }
 
 type Meeting {

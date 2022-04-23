@@ -98,6 +98,9 @@ func TestGraphQL(t *testing.T) {
 		scheduleID = res.ScheduleCreate
 	})
 
+	meetingStartedAt := time.Now().UTC().Round(time.Microsecond)
+	meetingEndedAt := meetingStartedAt.Add(time.Hour)
+	var meetingID int
 	t.Run("creating meeting", func(t *testing.T) {
 		var res struct {
 			MeetingCreate int `json:"meetingCreate"`
@@ -105,22 +108,24 @@ func TestGraphQL(t *testing.T) {
 		query := `mutation ($input: MeetingCreate!) {
 			meetingCreate(input: $input)
 		}`
-		startedAt := time.Now()
-		endedAt := startedAt.Add(time.Hour)
 		input := model.MeetingCreate{
 			ScheduleID: scheduleID,
-			StartedAt:  startedAt,
-			EndedAt:    endedAt,
+			StartedAt:  meetingStartedAt,
+			EndedAt:    meetingEndedAt,
 		}
 		err := c.Query(ctx, query, client.Variables{"input": input}, &res)
 		require.NoError(t, err)
+		meetingID = res.MeetingCreate
 	})
 
 	t.Run("query team, schedules, meetings", func(t *testing.T) {
 		var res struct {
 			TeamByID struct {
 				model.Team
-				Schedules []model.Schedule `json:"schedules"`
+				Schedules []struct {
+					model.Schedule
+					Meetings []model.Meeting `json:"meetings"`
+				} `json:"schedules"`
 			} `json:"teamByID"`
 		}
 		query := `query ($id: ID!) {
@@ -137,6 +142,14 @@ func TestGraphQL(t *testing.T) {
 					endsAt
 					createdAt
 					updatedAt
+					meetings {
+						id
+						scheduleId
+						startedAt
+						endedAt
+						createdAt
+						updatedAt
+					}
 				}
 			}
 		}`
@@ -158,6 +171,16 @@ func TestGraphQL(t *testing.T) {
 		require.Equal(t, scheduleEndsAt, schedule.EndsAt)
 		require.NotZero(t, schedule.CreatedAt)
 		require.Nil(t, schedule.UpdatedAt)
+
+		require.Len(t, schedule.Meetings, 1)
+		meeting := schedule.Meetings[0]
+
+		require.Equal(t, meetingID, meeting.ID)
+		require.Equal(t, scheduleID, meeting.ScheduleID)
+		require.Equal(t, meetingStartedAt, meeting.StartedAt)
+		require.Equal(t, meetingEndedAt, meeting.EndedAt)
+		require.NotZero(t, meeting.CreatedAt)
+		require.Nil(t, meeting.UpdatedAt)
 	})
 }
 

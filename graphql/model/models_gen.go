@@ -29,6 +29,7 @@ type Schedule struct {
 	EndsAt    time.Time  `json:"endsAt"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
+	Meetings  []Meeting  `json:"meetings"`
 }
 
 type ScheduleCreate struct {

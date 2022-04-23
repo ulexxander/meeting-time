@@ -58,3 +58,7 @@ models:
     fields:
       schedules:
         resolver: true
+  Schedule:
+    fields:
+      meetings:
+        resolver: true

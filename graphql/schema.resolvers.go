@@ -81,14 +81,15 @@ func (r *queryResolver) MeetingByID(ctx context.Context, id int) (*model.Meeting
 		}
 		return nil, err
 	}
-	return &model.Meeting{
-		ID:         item.ID,
-		ScheduleID: item.ScheduleID,
-		StartedAt:  item.StartedAt,
-		EndedAt:    item.EndedAt,
-		CreatedAt:  item.CreatedAt,
-		UpdatedAt:  item.UpdatedAt,
-	}, nil
+	return convertMeeting(item), nil
+}
+
+func (r *scheduleResolver) Meetings(ctx context.Context, obj *model.Schedule) ([]model.Meeting, error) {
+	items, err := r.meetingsService.MeetingsBySchedule(ctx, obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	return convertMeetings(items), nil
 }
 
 func (r *teamResolver) Schedules(ctx context.Context, obj *model.Team) ([]model.Schedule, error) {
@@ -105,11 +106,15 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Schedule returns generated.ScheduleResolver implementation.
+func (r *Resolver) Schedule() generated.ScheduleResolver { return &scheduleResolver{r} }
+
 // Team returns generated.TeamResolver implementation.
 func (r *Resolver) Team() generated.TeamResolver { return &teamResolver{r} }
 
 type (
 	mutationResolver struct{ *Resolver }
 	queryResolver    struct{ *Resolver }
+	scheduleResolver struct{ *Resolver }
 	teamResolver     struct{ *Resolver }
 )
