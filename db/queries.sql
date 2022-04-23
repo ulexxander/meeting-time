@@ -20,3 +20,16 @@ WHERE team_id = $1;
 INSERT INTO schedules (team_id, name, starts_at, ends_at)
 VALUES ($1, $2, $3, $4)
 RETURNING id;
+
+-- name: MeetingByID :one
+SELECT * FROM meetings
+WHERE id = $1;
+
+-- name: MeetingsBySchedule :many
+SELECT * FROM meetings
+WHERE schedule_id = $1;
+
+-- name: MeetingCreate :one
+INSERT INTO meetings (schedule_id, started_at, ended_at)
+VALUES ($1, $2, $3)
+RETURNING id;

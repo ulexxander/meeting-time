@@ -11,4 +11,5 @@ import (
 type Resolver struct {
 	TeamsService     *services.TeamsService
 	SchedulesService *services.SchedulesService
+	MeetingsService  *services.MeetingsService
 }

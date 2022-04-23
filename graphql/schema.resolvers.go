@@ -32,6 +32,18 @@ func (r *mutationResolver) ScheduleCreate(ctx context.Context, input model.Sched
 	return id, nil
 }
 
+func (r *mutationResolver) MeetingCreate(ctx context.Context, input model.MeetingCreate) (int, error) {
+	id, err := r.MeetingsService.MeetingCreate(ctx, db.MeetingCreateParams{
+		ScheduleID: input.ScheduleID,
+		StartedAt:  input.StartedAt,
+		EndedAt:    input.EndedAt,
+	})
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
 func (r *queryResolver) TeamByID(ctx context.Context, id int) (*model.Team, error) {
 	item, err := r.TeamsService.TeamByID(ctx, id)
 	if err != nil {
@@ -51,6 +63,21 @@ func (r *queryResolver) ScheduleByID(ctx context.Context, id int) (*model.Schedu
 		return nil, err
 	}
 	return convertSchedule(item), nil
+}
+
+func (r *queryResolver) MeetingByID(ctx context.Context, id int) (*model.Meeting, error) {
+	item, err := r.MeetingsService.MeetingByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Meeting{
+		ID:         item.ID,
+		ScheduleID: item.ScheduleID,
+		StartedAt:  item.StartedAt,
+		EndedAt:    item.EndedAt,
+		CreatedAt:  item.CreatedAt,
+		UpdatedAt:  item.UpdatedAt,
+	}, nil
 }
 
 func (r *teamResolver) Schedules(ctx context.Context, obj *model.Team) ([]model.Schedule, error) {

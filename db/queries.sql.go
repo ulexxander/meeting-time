@@ -10,6 +10,79 @@ import (
 	"time"
 )
 
+const meetingByID = `-- name: MeetingByID :one
+SELECT id, schedule_id, started_at, ended_at, created_at, updated_at FROM meetings
+WHERE id = $1
+`
+
+func (q *Queries) MeetingByID(ctx context.Context, id int) (Meeting, error) {
+	row := q.db.QueryRowContext(ctx, meetingByID, id)
+	var i Meeting
+	err := row.Scan(
+		&i.ID,
+		&i.ScheduleID,
+		&i.StartedAt,
+		&i.EndedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const meetingCreate = `-- name: MeetingCreate :one
+INSERT INTO meetings (schedule_id, started_at, ended_at)
+VALUES ($1, $2, $3)
+RETURNING id
+`
+
+type MeetingCreateParams struct {
+	ScheduleID int
+	StartedAt  time.Time
+	EndedAt    time.Time
+}
+
+func (q *Queries) MeetingCreate(ctx context.Context, arg MeetingCreateParams) (int, error) {
+	row := q.db.QueryRowContext(ctx, meetingCreate, arg.ScheduleID, arg.StartedAt, arg.EndedAt)
+	var id int
+	err := row.Scan(&id)
+	return id, err
+}
+
+const meetingsBySchedule = `-- name: MeetingsBySchedule :many
+SELECT id, schedule_id, started_at, ended_at, created_at, updated_at FROM meetings
+WHERE schedule_id = $1
+`
+
+func (q *Queries) MeetingsBySchedule(ctx context.Context, scheduleID int) ([]Meeting, error) {
+	rows, err := q.db.QueryContext(ctx, meetingsBySchedule, scheduleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Meeting
+	for rows.Next() {
+		var i Meeting
+		if err := rows.Scan(
+			&i.ID,
+			&i.ScheduleID,
+			&i.StartedAt,
+			&i.EndedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const scheduleByID = `-- name: ScheduleByID :one
 SELECT id, team_id, name, starts_at, ends_at, created_at, updated_at FROM schedules
 WHERE id = $1

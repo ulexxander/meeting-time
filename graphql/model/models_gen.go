@@ -6,6 +6,21 @@ import (
 	"time"
 )
 
+type Meeting struct {
+	ID         int        `json:"id"`
+	ScheduleID int        `json:"scheduleId"`
+	StartedAt  time.Time  `json:"startedAt"`
+	EndedAt    time.Time  `json:"endedAt"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  *time.Time `json:"updatedAt"`
+}
+
+type MeetingCreate struct {
+	ScheduleID int       `json:"scheduleId"`
+	StartedAt  time.Time `json:"startedAt"`
+	EndedAt    time.Time `json:"endedAt"`
+}
+
 type Schedule struct {
 	ID        int        `json:"id"`
 	TeamID    int        `json:"teamId"`

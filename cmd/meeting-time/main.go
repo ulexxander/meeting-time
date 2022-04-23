@@ -81,11 +81,13 @@ func run(log *logrus.Logger) error {
 
 	teamsService := services.NewTeamsService(queries)
 	schedulesService := services.NewSchedulesService(queries)
+	meetingsService := services.NewMeetingsService(queries)
 
 	schema := generated.NewExecutableSchema(generated.Config{
 		Resolvers: &graphql.Resolver{
 			TeamsService:     teamsService,
 			SchedulesService: schedulesService,
+			MeetingsService:  meetingsService,
 		},
 	})
 	server := handler.NewDefaultServer(schema)

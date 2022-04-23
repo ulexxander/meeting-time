@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+type Meeting struct {
+	ID         int
+	ScheduleID int
+	StartedAt  time.Time
+	EndedAt    time.Time
+	CreatedAt  time.Time
+	UpdatedAt  *time.Time
+}
+
 type Schedule struct {
 	ID        int
 	TeamID    int

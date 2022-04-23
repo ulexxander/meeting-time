@@ -18,9 +18,19 @@ type Schedule {
   updatedAt: Time
 }
 
+type Meeting {
+  id: ID!
+  scheduleId: Int!
+  startedAt: Time!
+  endedAt: Time!
+  createdAt: Time!
+  updatedAt: Time
+}
+
 type Query {
   teamByID(id: ID!): Team!
   scheduleByID(id: ID!): Schedule!
+  meetingByID(id: ID!): Meeting!
 }
 
 input TeamCreate {
@@ -34,7 +44,14 @@ input ScheduleCreate {
   endsAt: Time!
 }
 
+input MeetingCreate {
+  scheduleId: ID!
+  startedAt: Time!
+  endedAt: Time!
+}
+
 type Mutation {
   teamCreate(input: TeamCreate!): ID!
   scheduleCreate(input: ScheduleCreate!): ID!
+  meetingCreate(input: MeetingCreate!): ID!
 }
