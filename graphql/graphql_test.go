@@ -1,6 +1,8 @@
 package graphql_test
 
 import (
+	"flag"
+	"log"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -14,6 +16,8 @@ import (
 	"github.com/ulexxander/meeting-time/services"
 	"github.com/ulexxander/meeting-time/testutil"
 )
+
+var flagQueryLog = flag.Bool("query-log", false, "Log GraphQL queries and responses")
 
 func TestGraphQL(t *testing.T) {
 	ctx := testutil.Context(t)
@@ -204,7 +208,12 @@ func setupClient(t *testing.T) *client.Client {
 	server := httptest.NewServer(gqlServer)
 	t.Cleanup(server.Close)
 
-	return &client.Client{
+	c := &client.Client{
 		URL: server.URL,
 	}
+	if *flagQueryLog {
+		c.Logger = &client.LoggerStd{Logger: log.Default()}
+	}
+
+	return c
 }

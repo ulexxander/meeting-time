@@ -10,7 +10,8 @@ import (
 )
 
 type Client struct {
-	URL string
+	URL    string
+	Logger Logger
 }
 
 type Variables map[string]interface{}
@@ -39,6 +40,10 @@ func (e *Error) Error() string {
 }
 
 func (c *Client) Query(ctx context.Context, query string, variables Variables, dest interface{}) error {
+	if c.Logger != nil {
+		c.Logger.Query(query, variables)
+	}
+
 	params := struct {
 		Query     string    `json:"query"`
 		Variables Variables `json:"variables"`
@@ -67,6 +72,10 @@ func (c *Client) Query(ctx context.Context, query string, variables Variables, d
 	resBodyJSON, err := io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("recoding response body: %w", err)
+	}
+
+	if c.Logger != nil {
+		c.Logger.QueryResponse(resBodyJSON)
 	}
 
 	resBody := struct {
