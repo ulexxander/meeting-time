@@ -93,8 +93,8 @@ func run(log *logrus.Logger) error {
 	})
 	gqlServer := handler.NewDefaultServer(gqlSchema)
 
-	http.Handle("/query", gqlServer)
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/graphql", withCors(gqlServer))
+	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	log.Warn("GraphQL playground is enabled")
 
 	log.WithField("addr", flags.addr).Info("Starting HTTP server")
@@ -103,6 +103,15 @@ func run(log *logrus.Logger) error {
 	}
 
 	return nil
+}
+
+func withCors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func setupDB(flags *flags, log *logrus.Logger) (*sql.DB, error) {
