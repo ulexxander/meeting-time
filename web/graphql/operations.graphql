@@ -1,0 +1,6 @@
+query TeamByID($id: ID!) {
+  teamByID(id: $id) {
+    id
+    name
+  }
+}
