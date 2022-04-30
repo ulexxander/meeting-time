@@ -1,8 +1,12 @@
-overwrite: true
-
 schema: ../graphql/schema.graphql
 
 documents: ./graphql/*.graphql
+
+overwrite: true
+
+hooks:
+  afterAllFileWrite:
+    - prettier -w .
 
 generates:
   graphql/generated.ts:
