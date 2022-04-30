@@ -6,7 +6,7 @@ overwrite: true
 
 hooks:
   afterAllFileWrite:
-    - prettier -w .
+    - prettier -w ./graphql/generated.ts
 
 generates:
   graphql/generated.ts:
