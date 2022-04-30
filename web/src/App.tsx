@@ -34,16 +34,8 @@ const Team: React.FC<{ id: number }> = ({ id }) => {
 
 const TeamsPage: React.FC = () => {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        padding: 64,
-        fontSize: 24,
-      }}
-    >
-      <p style={{ textAlign: "center" }}>App!</p>
+    <div className="flex flex-col items-center p-16 text-xl">
+      <p className="text-center">App!</p>
       <Team id={1} />
       <Team id={2} />
       <Team id={99} />
