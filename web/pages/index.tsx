@@ -1,20 +1,17 @@
-import { gql } from "@apollo/client";
 import { NextPage } from "next";
 import Head from "next/head";
 import { client } from "../graphql/client";
+import {
+  TeamByIdDocument,
+  TeamByIdQuery,
+  TeamByIdQueryVariables,
+} from "../graphql/generated";
 
-const query = gql`
-  query TeamByID($id: ID!) {
-    teamByID(id: $id) {
-      id
-      name
-    }
-  }
-`;
+type HomeProps = { team: TeamByIdQuery["teamByID"] };
 
 export async function getServerSideProps() {
-  const { data } = await client.query({
-    query,
+  const { data } = await client.query<TeamByIdQuery, TeamByIdQueryVariables>({
+    query: TeamByIdDocument,
     variables: {
       id: "1",
     },
@@ -27,12 +24,7 @@ export async function getServerSideProps() {
   };
 }
 
-type Team = {
-  id: number;
-  name: string;
-};
-
-const Home: NextPage<{ team: Team }> = ({ team }) => {
+const Home: NextPage<HomeProps> = ({ team }) => {
   return (
     <div>
       <Head>
@@ -42,9 +34,13 @@ const Home: NextPage<{ team: Team }> = ({ team }) => {
       <div style={{ textAlign: "center" }}>
         <h1>Hello Next!</h1>
 
-        <p>
-          Team: {team.name} #{team.id}
-        </p>
+        {team ? (
+          <p>
+            Team: {team.name} #{team.id}
+          </p>
+        ) : (
+          <p>Team does not exist...</p>
+        )}
       </div>
     </div>
   );
