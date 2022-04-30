@@ -117,6 +117,15 @@ export type TeamByIdQuery = {
   teamByID?: { __typename?: "Team"; id: string; name: string } | null;
 };
 
+export type TeamCreateMutationVariables = Exact<{
+  input: TeamCreate;
+}>;
+
+export type TeamCreateMutation = {
+  __typename?: "Mutation";
+  teamCreate: string;
+};
+
 export const TeamByIdDocument = gql`
   query TeamByID($id: ID!) {
     teamByID(id: $id) {
@@ -170,4 +179,52 @@ export type TeamByIdLazyQueryHookResult = ReturnType<
 export type TeamByIdQueryResult = Apollo.QueryResult<
   TeamByIdQuery,
   TeamByIdQueryVariables
+>;
+export const TeamCreateDocument = gql`
+  mutation TeamCreate($input: TeamCreate!) {
+    teamCreate(input: $input)
+  }
+`;
+export type TeamCreateMutationFn = Apollo.MutationFunction<
+  TeamCreateMutation,
+  TeamCreateMutationVariables
+>;
+
+/**
+ * __useTeamCreateMutation__
+ *
+ * To run a mutation, you first call `useTeamCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTeamCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [teamCreateMutation, { data, loading, error }] = useTeamCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useTeamCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    TeamCreateMutation,
+    TeamCreateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<TeamCreateMutation, TeamCreateMutationVariables>(
+    TeamCreateDocument,
+    options
+  );
+}
+export type TeamCreateMutationHookResult = ReturnType<
+  typeof useTeamCreateMutation
+>;
+export type TeamCreateMutationResult =
+  Apollo.MutationResult<TeamCreateMutation>;
+export type TeamCreateMutationOptions = Apollo.BaseMutationOptions<
+  TeamCreateMutation,
+  TeamCreateMutationVariables
 >;

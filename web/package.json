@@ -7,6 +7,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "format": "prettier -w .",
+    "typecheck": "tsc",
     "graphql": "graphql-codegen --config ./graphql-codegen.yml"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "graphql": "^16.4.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-hook-form": "^7.30.0",
     "react-router-dom": "^6.3.0"
   },
   "devDependencies": {

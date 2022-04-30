@@ -4,3 +4,7 @@ query TeamByID($id: ID!) {
     name
   }
 }
+
+mutation TeamCreate($input: TeamCreate!) {
+  teamCreate(input: $input)
+}
