@@ -1,52 +1,29 @@
 import { ApolloProvider } from "@apollo/client";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { client } from "../graphql/client";
-import { useTeamByIdQuery } from "../graphql/generated";
+import { TeamCreatePage } from "./pages/TeamCreatePage";
+import { TeamPage } from "./pages/TeamPage";
 
-const Team: React.FC<{ id: number }> = ({ id }) => {
-  const { data, error } = useTeamByIdQuery({
-    variables: {
-      id: id.toString(),
-    },
-  });
-
-  if (error) {
-    return (
-      <p>
-        Error: {error.name} {error.message}
-      </p>
-    );
-  }
-
-  if (!data) {
-    return <p>Loading...</p>;
-  }
-
-  if (!data.teamByID) {
-    return <p>Team with id {id} does not exist</p>;
-  }
-
-  return (
-    <p>
-      Team {data.teamByID.id}: {data.teamByID.name}
-    </p>
-  );
+const NotFound: React.FC = () => {
+  return <p>404 Not Found</p>;
 };
 
-const TeamsPage: React.FC = () => {
+const Routing: React.FC = () => {
   return (
-    <div className="flex flex-col items-center p-16 text-xl">
-      <p className="text-center">App!</p>
-      <Team id={1} />
-      <Team id={2} />
-      <Team id={99} />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/team/create" element={<TeamCreatePage />} />
+        <Route path="/team/:id" element={<TeamPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
 export const App: React.FC = () => {
   return (
     <ApolloProvider client={client}>
-      <TeamsPage />
+      <Routing />
     </ApolloProvider>
   );
 };
