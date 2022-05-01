@@ -3,6 +3,7 @@ package graphql
 import (
 	"github.com/ulexxander/meeting-time/db"
 	"github.com/ulexxander/meeting-time/graphql/model"
+	"github.com/ulexxander/meeting-time/graphql/scalars"
 )
 
 func convertSchedule(item *db.Schedule) *model.Schedule {
@@ -10,8 +11,8 @@ func convertSchedule(item *db.Schedule) *model.Schedule {
 		ID:        item.ID,
 		TeamID:    item.TeamID,
 		Name:      item.Name,
-		StartsAt:  item.StartsAt,
-		EndsAt:    item.EndsAt,
+		StartsAt:  scalars.TimeOfDay(item.StartsAt),
+		EndsAt:    scalars.TimeOfDay(item.EndsAt),
 		CreatedAt: item.CreatedAt,
 		UpdatedAt: item.UpdatedAt,
 	}

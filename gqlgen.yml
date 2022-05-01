@@ -54,6 +54,8 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  TimeOfDay:
+    model: github.com/ulexxander/meeting-time/graphql/scalars.TimeOfDay
   Team:
     fields:
       schedules:

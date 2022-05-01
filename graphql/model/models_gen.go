@@ -4,6 +4,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/ulexxander/meeting-time/graphql/scalars"
 )
 
 type Meeting struct {
@@ -22,14 +24,14 @@ type MeetingCreate struct {
 }
 
 type Schedule struct {
-	ID        int        `json:"id"`
-	TeamID    int        `json:"teamId"`
-	Name      string     `json:"name"`
-	StartsAt  time.Time  `json:"startsAt"`
-	EndsAt    time.Time  `json:"endsAt"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	Meetings  []Meeting  `json:"meetings"`
+	ID        int               `json:"id"`
+	TeamID    int               `json:"teamId"`
+	Name      string            `json:"name"`
+	StartsAt  scalars.TimeOfDay `json:"startsAt"`
+	EndsAt    scalars.TimeOfDay `json:"endsAt"`
+	CreatedAt time.Time         `json:"createdAt"`
+	UpdatedAt *time.Time        `json:"updatedAt"`
+	Meetings  []Meeting         `json:"meetings"`
 }
 
 type ScheduleCreate struct {

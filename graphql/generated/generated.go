@@ -14,6 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/ulexxander/meeting-time/graphql/model"
+	"github.com/ulexxander/meeting-time/graphql/scalars"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -389,6 +390,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "graphql/schema.graphql", Input: `scalar Time
+scalar TimeOfDay
 
 type Team {
   id: ID!
@@ -402,8 +404,8 @@ type Schedule {
   id: ID!
   teamId: ID!
   name: String!
-  startsAt: Time!
-  endsAt: Time!
+  startsAt: TimeOfDay!
+  endsAt: TimeOfDay!
   createdAt: Time!
   updatedAt: Time
   meetings: [Meeting!]!
@@ -1253,9 +1255,9 @@ func (ec *executionContext) _Schedule_startsAt(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(time.Time)
+	res := resTmp.(scalars.TimeOfDay)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTimeOfDay2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋscalarsᚐTimeOfDay(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Schedule_endsAt(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
@@ -1288,9 +1290,9 @@ func (ec *executionContext) _Schedule_endsAt(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(time.Time)
+	res := resTmp.(scalars.TimeOfDay)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTimeOfDay2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋscalarsᚐTimeOfDay(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Schedule_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
@@ -3905,6 +3907,16 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNTimeOfDay2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋscalarsᚐTimeOfDay(ctx context.Context, v interface{}) (scalars.TimeOfDay, error) {
+	var res scalars.TimeOfDay
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTimeOfDay2githubᚗcomᚋulexxanderᚋmeetingᚑtimeᚋgraphqlᚋscalarsᚐTimeOfDay(ctx context.Context, sel ast.SelectionSet, v scalars.TimeOfDay) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
