@@ -1,8 +1,40 @@
 import { useParams } from "react-router";
-import { useTeamByIdQuery } from "../../graphql/generated";
+import { TeamByIdQuery, useTeamByIdQuery } from "../../graphql/generated";
 import { Page } from "../components/layout";
 
-const Team: React.FC<{ id: number }> = ({ id }) => {
+type TeamData = NonNullable<TeamByIdQuery["teamByID"]>;
+
+const Schedules: React.FC<{ schedules: TeamData["schedules"] }> = ({
+  schedules,
+}) => {
+  return (
+    <ol className="list-decimal">
+      {schedules.map((item) => (
+        <li key={item.id}>
+          <p>{item.name}</p>
+          <p className="tracking-widest">
+            {item.startsAt} - {item.endsAt}
+          </p>
+        </li>
+      ))}
+    </ol>
+  );
+};
+
+const Team: React.FC<{ team: TeamData }> = ({ team }) => {
+  const { id, name, schedules } = team;
+  return (
+    <div>
+      <h3>{name}</h3>
+      <p className="text-sm text-gray-600">Team #{id}</p>
+      <div className="mt-4">
+        <Schedules schedules={schedules} />
+      </div>
+    </div>
+  );
+};
+
+const TeamLoader: React.FC<{ id: number }> = ({ id }) => {
   const { data, error } = useTeamByIdQuery({
     variables: {
       id,
@@ -25,11 +57,7 @@ const Team: React.FC<{ id: number }> = ({ id }) => {
     return <p>Team with id {id} does not exist</p>;
   }
 
-  return (
-    <p>
-      Team {data.teamByID.id}: {data.teamByID.name}
-    </p>
-  );
+  return <Team team={data.teamByID} />;
 };
 
 const TeamByID: React.FC = () => {
@@ -40,14 +68,13 @@ const TeamByID: React.FC = () => {
     return <p>Invalid team id: {id}</p>;
   }
 
-  return <Team id={idInt} />;
+  return <TeamLoader id={idInt} />;
 };
 
 export const TeamRoute: React.FC = () => {
   return (
     <Page>
       <div className="text-xl">
-        <p>This is the team</p>
         <TeamByID />
       </div>
     </Page>

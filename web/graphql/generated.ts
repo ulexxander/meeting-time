@@ -115,7 +115,18 @@ export type TeamByIdQueryVariables = Exact<{
 
 export type TeamByIdQuery = {
   __typename?: "Query";
-  teamByID?: { __typename?: "Team"; id: number; name: string } | null;
+  teamByID?: {
+    __typename?: "Team";
+    id: number;
+    name: string;
+    schedules: Array<{
+      __typename?: "Schedule";
+      id: number;
+      name: string;
+      startsAt: string;
+      endsAt: string;
+    }>;
+  } | null;
 };
 
 export type TeamCreateMutationVariables = Exact<{
@@ -127,11 +138,26 @@ export type TeamCreateMutation = {
   teamCreate: number;
 };
 
+export type ScheduleCreateMutationVariables = Exact<{
+  input: ScheduleCreate;
+}>;
+
+export type ScheduleCreateMutation = {
+  __typename?: "Mutation";
+  scheduleCreate: number;
+};
+
 export const TeamByIdDocument = gql`
   query TeamByID($id: ID!) {
     teamByID(id: $id) {
       id
       name
+      schedules {
+        id
+        name
+        startsAt
+        endsAt
+      }
     }
   }
 `;
@@ -228,4 +254,52 @@ export type TeamCreateMutationResult =
 export type TeamCreateMutationOptions = Apollo.BaseMutationOptions<
   TeamCreateMutation,
   TeamCreateMutationVariables
+>;
+export const ScheduleCreateDocument = gql`
+  mutation ScheduleCreate($input: ScheduleCreate!) {
+    scheduleCreate(input: $input)
+  }
+`;
+export type ScheduleCreateMutationFn = Apollo.MutationFunction<
+  ScheduleCreateMutation,
+  ScheduleCreateMutationVariables
+>;
+
+/**
+ * __useScheduleCreateMutation__
+ *
+ * To run a mutation, you first call `useScheduleCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useScheduleCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [scheduleCreateMutation, { data, loading, error }] = useScheduleCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useScheduleCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ScheduleCreateMutation,
+    ScheduleCreateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ScheduleCreateMutation,
+    ScheduleCreateMutationVariables
+  >(ScheduleCreateDocument, options);
+}
+export type ScheduleCreateMutationHookResult = ReturnType<
+  typeof useScheduleCreateMutation
+>;
+export type ScheduleCreateMutationResult =
+  Apollo.MutationResult<ScheduleCreateMutation>;
+export type ScheduleCreateMutationOptions = Apollo.BaseMutationOptions<
+  ScheduleCreateMutation,
+  ScheduleCreateMutationVariables
 >;

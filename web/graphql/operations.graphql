@@ -2,9 +2,19 @@ query TeamByID($id: ID!) {
   teamByID(id: $id) {
     id
     name
+    schedules {
+      id
+      name
+      startsAt
+      endsAt
+    }
   }
 }
 
 mutation TeamCreate($input: TeamCreate!) {
   teamCreate(input: $input)
+}
+
+mutation ScheduleCreate($input: ScheduleCreate!) {
+  scheduleCreate(input: $input)
 }
