@@ -14,12 +14,13 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
+  ID: number;
   String: string;
   Boolean: boolean;
   Int: number;
   Float: number;
   Time: any;
+  TimeOfDay: string;
 };
 
 export type Meeting = {
@@ -79,11 +80,11 @@ export type QueryTeamByIdArgs = {
 export type Schedule = {
   __typename?: "Schedule";
   createdAt: Scalars["Time"];
-  endsAt: Scalars["Time"];
+  endsAt: Scalars["TimeOfDay"];
   id: Scalars["ID"];
   meetings: Array<Meeting>;
   name: Scalars["String"];
-  startsAt: Scalars["Time"];
+  startsAt: Scalars["TimeOfDay"];
   teamId: Scalars["ID"];
   updatedAt?: Maybe<Scalars["Time"]>;
 };
@@ -114,7 +115,7 @@ export type TeamByIdQueryVariables = Exact<{
 
 export type TeamByIdQuery = {
   __typename?: "Query";
-  teamByID?: { __typename?: "Team"; id: string; name: string } | null;
+  teamByID?: { __typename?: "Team"; id: number; name: string } | null;
 };
 
 export type TeamCreateMutationVariables = Exact<{
@@ -123,7 +124,7 @@ export type TeamCreateMutationVariables = Exact<{
 
 export type TeamCreateMutation = {
   __typename?: "Mutation";
-  teamCreate: string;
+  teamCreate: number;
 };
 
 export const TeamByIdDocument = gql`

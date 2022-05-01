@@ -14,3 +14,7 @@ generates:
       - typescript
       - typescript-operations
       - typescript-react-apollo
+    config:
+      scalars:
+        ID: number
+        TimeOfDay: string
