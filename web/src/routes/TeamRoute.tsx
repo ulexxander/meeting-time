@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import { useTeamByIdQuery } from "../../graphql/generated";
+import { Page } from "../components/layout";
 
 const Team: React.FC<{ id: number }> = ({ id }) => {
   const { data, error } = useTeamByIdQuery({
@@ -42,11 +43,13 @@ const TeamByID: React.FC = () => {
   return <Team id={idInt} />;
 };
 
-export const TeamPage: React.FC = () => {
+export const TeamRoute: React.FC = () => {
   return (
-    <div className="flex flex-col items-center p-16 text-xl">
-      <p>This is the team</p>
-      <TeamByID />
-    </div>
+    <Page>
+      <div className="text-xl">
+        <p>This is the team</p>
+        <TeamByID />
+      </div>
+    </Page>
   );
 };

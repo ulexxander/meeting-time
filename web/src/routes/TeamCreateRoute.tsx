@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTeamCreateMutation } from "../../graphql/generated";
 import { Page } from "../components/layout";
 
-const teamPageRedirectTimeout = 1000;
+const teamRouteRedirectTimeout = 1000;
 
 const TeamCreateForm: React.FC = () => {
   const { register, handleSubmit, formState } = useForm<{
@@ -17,7 +17,7 @@ const TeamCreateForm: React.FC = () => {
     if (data?.teamCreate) {
       const timeout = setTimeout(() => {
         navigate(`/team/${data.teamCreate}`);
-      }, teamPageRedirectTimeout);
+      }, teamRouteRedirectTimeout);
       return () => clearTimeout(timeout);
     }
     return () => {};
@@ -77,7 +77,7 @@ const TeamCreateForm: React.FC = () => {
   );
 };
 
-export const TeamCreatePage: React.FC = () => {
+export const TeamCreateRoute: React.FC = () => {
   return (
     <Page>
       <h2>Create new team</h2>
